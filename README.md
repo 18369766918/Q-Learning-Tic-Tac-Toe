@@ -11,4 +11,4 @@ Organization: Algoma University
 Enter this command: python3 train_3t.py
 
 # To run the play program
-Enter this command: python3 plya_3t.py
+Enter this command: python3 play_3t.py
