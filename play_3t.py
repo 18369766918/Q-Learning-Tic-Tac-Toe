@@ -23,13 +23,14 @@ EPISODES = 1000
 states = tf.placeholder(shape = [None, 3*3], dtype = tf.float32) # each state in a 3x3 image-like representation
 
 # Neural Network Model
-Y = tf.layers.dense(states, 200, activation = tf.nn.relu)
+Y = tf.layers.dense(states, 500, activation = tf.nn.relu)
 logits = tf.layers.dense(Y, 3*3) # the output is a 3x3 policy gradient
 
 # Sample an action from predicted probabilities
 sample = tf.argmax(logits,1)
 
-# Training Entry
+# Game Entry
+First = True
 with tf.Session() as sess:
 	saver = tf.train.Saver()
 
@@ -40,25 +41,14 @@ with tf.Session() as sess:
 
 	while True:
 
-		# User's Turn
-		row = int(input('row:'))-1
-		col = int(input('col:'))-1
-		action = row * 3 + col
-		board = game.move(board, turn, action)
-		available_actions[action] = 0
-		turn = 3 - turn
-		if game.win(board) == 1:
-			print('You win!')
-			break
-		if game.win(board) == 2:
-			print('Draw!')
-			break
-
 		# AI's Turn
 		state = game.flatten(board)
 		action = sess.run(sample, feed_dict = {states: [state]})
 		action = action[0]
 		if available_actions[action] == 0:
+			action = game.getRandMove(board)
+		if First == True:
+			First = False
 			action = game.getRandMove(board)
 		available_actions[action] = 0
 		board = game.move(board, turn, action)
@@ -73,6 +63,24 @@ with tf.Session() as sess:
 		# Display board
 		game.display(board)
 		print()
+
+		# User's Turn
+		row = int(input('row:'))-1
+		col = int(input('col:'))-1
+		action = row * 3 + col
+		board = game.move(board, turn, action)
+		available_actions[action] = 0
+		turn = 3 - turn
+		if game.win(board) == 1:
+			game.display(board)
+			print('You win!')
+			break
+		if game.win(board) == 2:
+			game.display(board)
+			print('Draw!')
+			break
+
+		
 
 
 
