@@ -32,7 +32,7 @@ logits = tf.layers.dense(Y, 3*3) # the output is a 3x3 policy gradient
 sample = tf.argmax(logits,1)
 
 # Loss function: softmax cross entropy
-loss = tf.reduce_sum(rewards * tf.losses.softmax_cross_entropy(onehot_labels = tf.one_hot(actions, 3*3), logits = logits))
+loss = tf.reduce_sum((-rewards) * tf.losses.softmax_cross_entropy(onehot_labels = tf.one_hot(actions, 3*3), logits = logits))
 
 # Optimizer: RMS 
 optimizer = tf.train.RMSPropOptimizer(learning_rate = 0.001, decay = 0.99).minimize(loss)
@@ -94,6 +94,7 @@ with tf.Session() as sess:
 					else:
 						_rewards[i] = -r
 					r = GAMMA*r # discount
+					flag = False
 					i -= 1
 			for i in range(len(_states)):
 				S.append(_states[i])
@@ -104,7 +105,7 @@ with tf.Session() as sess:
 		_, training_loss = sess.run([optimizer, loss], feed_dict = training_batch)
 		print('Episode:',episode,'  loss:', training_loss)
 		# save the trained neural network
-		if episode % 10 == 0:
+		if episode % 100 == 0:
 			saver.save(sess, 'nn_saved/model.ckpt')
 
 
